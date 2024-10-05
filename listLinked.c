@@ -158,6 +158,42 @@ void insertionSort(Liste* liste) {
     liste->first = sorted;
 }
 
+void boucleListe(const Liste* liste) {
+    node* current = liste->first;
+    node* firstNode = liste->first;
+    while(current->next != NULL) {
+        current = current->next;
+    }
+    current->next = firstNode;
+}
+
+bool isBoucle(const Liste* liste) {
+    node* current = liste->first->next;
+    node* firstNode = liste->first;
+    while(current != NULL) {
+        if(current == firstNode) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void fundMaxNodeAndReturnIt(Liste* liste) {
+    node* current = liste->first->next;
+    node *firstNode = liste->first,*maxNode = firstNode;
+    while(current != firstNode) {
+        if(current->value >= maxNode->value) {
+            maxNode = current;
+        }
+        current = current->next;
+    }
+    liste->first = maxNode;
+    while(current->next != maxNode) {
+        current = current->next;
+    }
+    current->next = NULL;
+}
+
 void deleteListLinked(Liste* liste) {
     node *current = liste->first,*suivant = NULL;
     while(current != NULL) {
@@ -166,6 +202,7 @@ void deleteListLinked(Liste* liste) {
         current = suivant;
     }
     free(liste);
+    liste = NULL;
 }
 
 int main(void) {
