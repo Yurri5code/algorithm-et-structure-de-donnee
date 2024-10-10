@@ -78,7 +78,7 @@ bool isEmpty(const Liste* liste) {
 
 int length(const Liste* liste) {
     int taille = 0;
-    node* current = liste->first;
+    const node* current = liste->first;
     while(current != NULL) {
         current = current->next;
         taille++;
@@ -132,12 +132,11 @@ void reverseList(Liste* liste) {
 
 
 void sortedInsert(node** head_ref, node* new_node) {
-    node* current;
     if (*head_ref == NULL || (*head_ref)->value >= new_node->value) {
         new_node->next = *head_ref;
         *head_ref = new_node;
     } else {
-        current = *head_ref;
+        node *current = *head_ref;
         while (current->next != NULL && current->next->value < new_node->value) {
             current = current->next;
         }
@@ -205,6 +204,70 @@ void deleteListLinked(Liste* liste) {
     liste = NULL;
 }
 
+void deleteNodeFromEnd(Liste* liste,int position) {
+    if(liste == NULL) {
+        printf("il n y a aucun element a supprimer la liste est vide\n");
+        return;
+    }
+    int taille = length(liste), s = abs(taille - position);
+    if(position > taille) {
+        fprintf(stderr,"la position est plus grande que la taille du tableau");
+        exit(0);
+    }
+    printf("la valeur de s : %d\n",s);
+    if(s == 0) {
+        node* current = liste->first;
+        liste->first = liste->first->next;
+        free(current);
+        return;
+    }
+    if(position == taille) {
+        node* current = liste->first;
+        node* prev = current;
+        while(current != NULL) {
+            prev = current;
+            current = current->next;
+        }
+        prev->next = NULL;
+        free(NULL);
+        return;
+    }
+    node* current = liste->first;
+    node* prev = current;
+    for(int i = 0;i < s;i++) {
+        prev = current;
+        current = current->next;
+    }
+    prev->next = current->next;
+    free(current);
+
+}
+
+//forme parfait de la fonction deleteNodeFromEnd supprimer une valeur de la liste en partant de la fin
+//cette algorithm a 0ms aux testes de leetcode et 63% d'espace soit 9.34 mb
+void deleteValueFromEnd(Liste* liste,const int position) {
+    if(liste->first->next == NULL) {
+        //et la position est forcement egal a 1 vue qu'il y a qu'un seul element dans la liste
+        liste->first = NULL;
+        return;
+    }
+    node *cur = liste->first,*prev = cur;
+    int count = length(liste);
+    int s = abs(count - position);
+    if(s == 0) {
+        node* delete = liste->first;
+        liste->first = liste->first->next;
+        free(delete);
+        return;
+    }
+    cur = liste->first;
+    for(int i = 0; i < s;i++) {
+        prev = cur;
+        cur = cur->next;
+    }
+    prev->next = cur->next;
+    free(cur);
+}
 int main(void) {
     Liste* liste_chainee = initialisation();
     int nbrElement = 0;
@@ -219,9 +282,12 @@ int main(void) {
     printList(liste_chainee);
     deleteNode(liste_chainee,5);
     printList(liste_chainee);
-    insertAtPosition(liste_chainee,5,11);
+    insertAtPosition(liste_chainee,4,11);
     printList(liste_chainee);
     insertionSort(liste_chainee);
+    printList(liste_chainee);
+    printf("delete from\n");
+    deleteNodeFromEnd(liste_chainee,2);
     printList(liste_chainee);
     deleteListLinked(liste_chainee);
     return 0;
