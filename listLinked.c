@@ -22,16 +22,16 @@ Liste* initialisation() {
     return premier;
 }
 
-void insertValueAtTop(Liste* liste,int nombre) {
+void insertValueAtTop(Liste* liste,const int nombre) {
     node* noeud = (node*)malloc(sizeof(node));
     noeud->value = nombre;
     noeud->next = liste->first;
     liste->first = noeud;
 }
 
-void insertValueAtEnd(Liste* liste,int nombre) {
+void insertValueAtEnd(Liste* liste,const int nombre) {
     node* noeud = (node*)malloc(sizeof(node*));
-    if(liste == NULL || noeud == NULL) {
+    if(noeud == NULL) {
         exit(EXIT_FAILURE);
     }
     noeud->value = nombre;
@@ -46,9 +46,10 @@ void insertValueAtEnd(Liste* liste,int nombre) {
         current = current->next;
     }
     current->next = noeud;
+
 }
 
-void insertAtPosition(Liste* liste,int position,int data) {
+void insertAtPosition(Liste* liste,const int position,const int data) {
     node* noeud = (node*)malloc(sizeof(node));
     noeud->value = data;
     if(position == 0) {
@@ -67,6 +68,10 @@ void insertAtPosition(Liste* liste,int position,int data) {
         noeud->next = NULL;
         current->next = noeud;
         return;
+    }
+    if(previous == NULL) {
+        fprintf(stderr,"la variable previous est NULL\n");
+        exit(EXIT_FAILURE);
     }
     previous->next = noeud;
     noeud->next = current;
@@ -268,8 +273,188 @@ void deleteValueFromEnd(Liste* liste,const int position) {
     prev->next = cur->next;
     free(cur);
 }
+
+/*
+ * dans le cas de la fonction listToArray ici il est connu a l'avance la taille maximal que contiendra le
+ * tableau, pour une utilisation optimal il faudra calculer la taille d'element de la liste pour une taille exacte de
+ *du tableau
+ */
+/*
+ * toutes ces fonctions resolus sur base de l'exercice leetcode add two numbers
+ * presente une certaine limitation au niveau de la taille maximale
+ * les nodes peuvent etre long de 100 , or un long ou un int ne peuvent pas contenir
+ * une valeur de 100 chiffre cette algorithm a passer 1565/1569
+ * c'etait une tres bonne aventure de l'ecrire /
+ * avec des unsigned int 1566/1569
+ */
+int* listToArray(const Liste* l,int* returnSIze) {
+    int* arr = (int*)malloc(100*sizeof(int));
+    node* current = l->first;
+    int i = 0;
+
+    while(current != NULL) {
+        arr[i] = current->value;
+        i++;
+        current = current->next;
+    }
+    free(current);
+    *returnSIze = i;
+    return arr;
+}
+
+int* listToArrayToGoodArray(const int* arr,int arrSize) {
+    int* tab = (int*)malloc(arrSize*sizeof(int));
+    int k = arrSize - 1;
+    for(int i = 0;i <= arrSize; i++) {
+        tab[i] = arr[k];
+        k--;
+    }
+    return tab;
+}
+
+long arrayToLong(int arr[],const int size) {
+    long result = 0;
+    long multiplier = 1;
+
+    for (int i = size - 1; i >= 0; i--) {
+        result += arr[i] * multiplier;
+        multiplier *= 10;
+    }
+
+    return result;
+}
+
+Liste* addTwoNumbers(Liste* L1,Liste* L2) {
+    if(L1 == NULL && L2 == NULL) {
+        return NULL;
+    }
+    if(L1 == NULL) {
+        return L2;
+    }
+    if(L2 == NULL) {
+        return L1;
+    }
+
+    int i = 0,j = 0;
+    int* arr1 = listToArray(L1,&i);
+    int* arr2 = listToArray(L2,&j);
+    if(arr1 == NULL || arr2 == NULL) {
+        fprintf(stderr,"l'allocation n'a pas marche\n");
+        exit(EXIT_FAILURE);
+    }
+    int* t1 = listToArrayToGoodArray(arr1,i);
+    int* t2 = listToArrayToGoodArray(arr2,j);
+    if(t1 == NULL || t2 == NULL) {
+        fprintf(stderr,"l'allocation n'a pas marche\n");
+        exit(EXIT_FAILURE);
+    }
+    long isArr1 = arrayToLong(t1,i);
+    long isArr2 = arrayToLong(t2,j);
+    long sum = isArr1 + isArr2;
+    for(int k = 0;k < i;k++)
+        printf("%d",arr1[k]);
+    printf("\n");
+    for(int k = 0;k < i;k++)
+        printf("%d",t1[k]);
+    printf("\n");
+    for(int k = 0;k<j;k++)
+        printf("%d",arr2[k]);
+    printf("\n");
+    for(int k = 0;k<j;k++)
+        printf("%d",t2[k]);
+    printf("\n");
+    printf("%ld %ld %ld\n",sum,isArr1,isArr2);
+
+    Liste* newListe = initialisation();
+
+    while(sum > 0) {
+        int n = sum%10;
+        insertValueAtEnd(newListe,n);
+        sum /= 10;
+    }
+    free(arr1);
+    free(arr2);
+    return newListe;
+}
+
+//addTwoNUmbers2 est la solution a la premiere version de fonction plus courte et qui ne
+//fait pas face a la contrainte de la taille max de long et int
+Liste* addTwoNumbers2(const Liste* l1,const Liste* l2) {
+    Liste* head = initialisation();
+    Liste* tail = initialisation();
+    node *liste_1 = l1->first,*liste_2 = l2->first,*cur_2 = tail->first;
+
+    int carry = 0;
+
+    while((liste_1 != NULL) || (liste_2 != NULL)) {
+        int sum = carry;
+
+        if((liste_1 != NULL)) {
+            sum += liste_1->value;
+            liste_1 = liste_1->next;
+        }
+        if(liste_2 != NULL) {
+            sum += liste_2->value;
+            liste_2 = liste_2->next;
+        }
+        if(sum >= 10) {
+            carry = sum/10;
+            sum %= 10;
+        }else {
+            carry = 0;
+        }
+        if(cur_2 == NULL) {
+            insertValueAtEnd(tail,sum);
+            head = tail;
+        }else {
+            insertValueAtEnd(tail,sum);
+        }
+
+    }
+    if(carry > 0) {
+        insertValueAtEnd(tail,carry);
+    }
+
+    return head;
+}
+
+
+void testAddTwoNumbers() {
+    Liste* l1 = initialisation();
+    Liste* l2 = initialisation();
+    printf("entrez le nombre d'element de la liste l1 et l2\n");
+    int nbr1 = 0,nbr2 = 0;
+
+    scanf("%d %d",&nbr1,&nbr2);
+
+    printf("entrez les elements de la premiere liste 1\n");
+    for(int i = 0;i < nbr1;i++) {
+        int value = 0;
+        scanf("%d",&value);
+        insertValueAtTop(l1,value);
+    }
+
+    printf("entrez les elements de la premiere liste 2\n");
+    for(int i = 0;i < nbr2;i++) {
+        int value = 0;
+        scanf("%d",&value);
+        insertValueAtTop(l2,value);
+    }
+    printf("affichage de la liste 1\n");
+    printList(l1);
+    printf("affichage de la liste 2\n");
+    printList(l2);
+    Liste* sum = addTwoNumbers2(l1,l2);
+    printf("affichage de la sum\n");
+    printList(sum);
+    deleteListLinked(l1);
+    deleteListLinked(l2);
+    deleteListLinked(sum);
+}
+
 int main(void) {
-    Liste* liste_chainee = initialisation();
+    testAddTwoNumbers();
+    /*Liste* liste_chainee = initialisation();
     int nbrElement = 0;
     printf("entrez le nombre d'element \n");
     scanf("%d",&nbrElement);
@@ -280,15 +465,15 @@ int main(void) {
         insertValueAtEnd(liste_chainee,value);
     }
     printList(liste_chainee);
-    deleteNode(liste_chainee,5);
-    printList(liste_chainee);
-    insertAtPosition(liste_chainee,4,11);
-    printList(liste_chainee);
+   // deleteNode(liste_chainee,5);
+    //printList(liste_chainee);
+    //insertAtPosition(liste_chainee,4,11);
+    //printList(liste_chainee);
     insertionSort(liste_chainee);
     printList(liste_chainee);
     printf("delete from\n");
     deleteNodeFromEnd(liste_chainee,2);
     printList(liste_chainee);
-    deleteListLinked(liste_chainee);
+    deleteListLinked(liste_chainee);*/
     return 0;
 }
