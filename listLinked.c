@@ -32,6 +32,7 @@ void insertValueAtTop(Liste* liste,const int nombre) {
 void insertValueAtEnd(Liste* liste,const int nombre) {
     node* noeud = (node*)malloc(sizeof(node*));
     if(noeud == NULL) {
+        fprintf(stderr,"l'allocation du noeud a echouee\n");
         exit(EXIT_FAILURE);
     }
     noeud->value = nombre;
@@ -418,6 +419,54 @@ Liste* addTwoNumbers2(const Liste* l1,const Liste* l2) {
     return head;
 }
 
+void swap(node* slow,node* speed) {
+    slow->next = speed->next;
+    speed->next = slow;
+}
+
+Liste* swapNode(Liste* liste) {
+    if(liste->first == NULL) {
+        return NULL;
+    }
+    if(liste->first->next == NULL) {
+        return liste;
+    }
+
+    node* slowNode = liste->first;
+    node* speedNode = liste->first->next;
+    liste->first = liste->first->next;
+    while(true) {
+        node* nextPair = speedNode->next;
+        swap(slowNode,speedNode);
+        if(nextPair == NULL || nextPair->next == NULL) {
+            break;
+        }
+
+        slowNode->next = nextPair->next;
+        slowNode = nextPair;
+        speedNode = nextPair->next;
+    }
+    return liste;
+}
+
+void testSwapNode() {
+    Liste* chaine = initialisation();
+
+    printf("entrez le nombre d'element de la liste \n");
+    int nbr = 0;
+    scanf("%d",&nbr);
+    for(int i = 0;i < nbr;i++) {
+        int value = 0;
+        scanf("%d",&value);
+        insertValueAtEnd(chaine,value);
+    }
+    printf("affichage de la liste avant l'echange\n");
+    printList(chaine);
+    swapNode(chaine);
+    printf("affichage de la liste apres\n");
+    printList(chaine);
+    deleteListLinked(chaine);
+}
 
 void testAddTwoNumbers() {
     Liste* l1 = initialisation();
@@ -453,7 +502,7 @@ void testAddTwoNumbers() {
 }
 
 int main(void) {
-    testAddTwoNumbers();
+    testSwapNode();
     /*Liste* liste_chainee = initialisation();
     int nbrElement = 0;
     printf("entrez le nombre d'element \n");
