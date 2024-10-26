@@ -128,3 +128,44 @@ int* replaceValueAtIndex(int* array,int index,int value) {
     array[index-1] = value;
     return array;
 }
+
+char** summaryRanges(int* nums, int numsSize, int* returnSize) {
+    char **res=malloc(sizeof(char*)*numsSize);
+    if (numsSize==0) {
+        *returnSize=0;
+        return res;
+    }
+    
+    int first=0,last=0,count=0;
+    
+    for (int i=1;i<numsSize;i++) {
+        if (nums[i-1]+1==nums[i]) {
+            last++;
+        } else {
+            res[count] =malloc(25);
+            if (first==last) {
+                sprintf(res[count],"%d",nums[first]);
+            } else {
+                sprintf(res[count],"%d->%d",nums[first],nums[last]);
+            }
+            count++;
+            first=last+1;
+            last++;
+        }
+    }
+    res[count] =malloc(25);
+    if (first==last) {
+        sprintf(res[count],"%d",nums[first]);
+    } else {
+        sprintf(res[count],"%d->%d",nums[first],nums[last]);
+    }
+    count++;
+   
+    *returnSize=count;
+    return res;
+}
+
+int* replaceValueAtIndex(int* array,int index,int value) {
+    array[index-1] = value;
+    return array;
+}
