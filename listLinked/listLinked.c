@@ -85,7 +85,7 @@ bool isEmpty(const Liste* liste) {
 int length(const Liste* liste) {
     int taille = 0;
     const node* current = liste->first;
-    while(current != NULL) {
+    while(current->next != NULL) {
         current = current->next;
         taille++;
     }
@@ -179,6 +179,7 @@ bool isBoucle(const Liste* liste) {
         if(current == firstNode) {
             return true;
         }
+        current = current->next;
     }
     return false;
 }
@@ -449,6 +450,60 @@ Liste* swapNode(Liste* liste) {
     return liste;
 }
 
+void rotateRight(Liste* liste,int k) {
+    if(liste->first == NULL || k == 0) {
+        fprintf(stderr,"la liste est vide\n");
+        return;
+    }
+
+    const int size = length(liste) + 1;
+    const node* firstBefore = liste->first;
+    boucleListe(liste);
+    if(isBoucle(liste)) {
+        printf("la liste a ete boucle avec succes\n");
+    }else {
+        printf("la liste n'a pas ete boucle\n");
+    }
+    k = k%size;
+    const int steps = size - k;
+    node* current = liste->first;
+    if(firstBefore == liste->first) {
+        printf("la liste n'a pas changee\n");
+    }
+    for(int i = 0;i < steps - 1;i++) {
+        current = current->next;
+    }
+    liste->first = current->next;
+    current->next = NULL;
+
+    if(isBoucle(liste)) {
+        printf("la liste a ete boucle avec succes\n");
+    }else {
+        printf("la liste n'a pas ete boucle\n");
+    }
+}
+
+void testRotateRight() {
+    Liste* chaine = initialisation();
+
+    printf("entrez le nombre d'element de la liste \n");
+    int nbr = 0,k = 0;
+    scanf("%d",&nbr);
+    for(int i = 0;i < nbr;i++) {
+        int value = 0;
+        scanf("%d",&value);
+        insertValueAtEnd(chaine,value);
+    }
+    printf("affichage de la liste avant la rotation\n");
+    printList(chaine);
+    printf("entrez le nombre k : \n");
+    scanf("%d",&k);
+    rotateRight(chaine,k);
+    printf("affichage de la liste apres la rotation de k = %d \n",k);
+    printList(chaine);
+    deleteListLinked(chaine);
+}
+
 void testSwapNode() {
     Liste* chaine = initialisation();
 
@@ -502,7 +557,7 @@ void testAddTwoNumbers() {
 }
 
 int main(void) {
-    testSwapNode();
+    testRotateRight();
     /*Liste* liste_chainee = initialisation();
     int nbrElement = 0;
     printf("entrez le nombre d'element \n");
