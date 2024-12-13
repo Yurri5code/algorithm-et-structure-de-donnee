@@ -1,18 +1,19 @@
+//
+// Created by claude delcroix on 31/10/2024.
+//
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
+#include "tree.h"
 
-typedef struct Tree Tree;
-struct Tree {
-    int data;
-    Tree* right;
-    Tree* left;
-    Tree* root;
-};
 
 Tree* createNode(const int data) {
     Tree* noeud = (Tree*)malloc(sizeof(Tree));
+    if(noeud == NULL) {
+        fprintf(stderr,"l'allocation a echoue\n");
+        exit(EXIT_FAILURE);
+    }
     noeud->data = data;
     noeud->left = NULL;
     noeud->right = NULL;
@@ -188,7 +189,7 @@ int count_left_tree(const Tree* root) {
     if(root == NULL) {
         return 0;
     }
-    return count_left_tree(root->left);
+    return count_left_tree(root->left) + 1;
 }
 
 bool sameTree(const Tree* tree_1,const Tree* tree_2) {
@@ -204,6 +205,7 @@ bool sameTree(const Tree* tree_1,const Tree* tree_2) {
     return sameTree(tree_1->left,tree_2->left) && sameTree(tree_1->right,tree_2->right);
 }
 
+//cette fonction elle semblable a maxDepth qui calcule la longue profondeur d'un arbre
 int height(const Tree* root) {
     if(root == NULL) {
         return 0;
@@ -238,88 +240,228 @@ void levelOrder(const Tree* root) {
     }
 }
 
-void testLevelOrder() {
-    Tree* root = NULL;
-    printf("remplissage de l'arbre \n");
-    for(int i = 0;i < 7;i++) {
-        int value = 0;
-        scanf("%d",&value);
-        root = insert(root,value);
+bool isSameTree(const Tree* tree_1,const Tree* tree_2) {
+    if(tree_1 == NULL && tree_2 == NULL) {
+        return true;
     }
-    levelOrder(root);
-    deleteTree(root);
+    if(tree_1 == NULL || tree_2 == NULL) {
+        return false;
+    }
+    if(tree_1 ->data != tree_2->data) {
+        return false;
+    }
+    return sameTree(tree_1->left,tree_2->right) && sameTree(tree_1->right,tree_2->left);
 }
 
-void testSameTree() {
-    Tree* tree_1 = NULL;
-    Tree* tree_2 = NULL;
-    printf("remplissage du premier arbre\n");
-    for(int i = 0;i < 3;i++) {
-        int value = 0;
-        scanf("%d",&value);
-        tree_1 = insert(tree_1,value);
-    }
-    printf("remplissage du second arbre\n");
-    for(int i = 0;i < 3;i++) {
-        int value = 0;
-        scanf("%d",&value);
-        tree_2 = insert(tree_2,value);
-    }
-    if(sameTree(tree_1,tree_2)) {
-        printf("les deux arbres sont identiques\n");
-    }
-    else {
-        printf("les deux arbres ne sont pas identiques\n");
-    }
-    deleteTree(tree_1);
-    free(tree_2);
+
+bool isSymmetricTree(const Tree* root) {
+    // il se peut que le test de root ne soit pas necessaire puisque
+    //la fonction isSameTree verifie cela, tout reste encore a verifier avec un test
+    /*if(root == NULL) {
+        return true;
+    }*/
+    return isSameTree(root->left,root->right);
 }
 
-int main(void) {
-    /*Tree* binaryTree = NULL;
-    for(int i = 0;i<10;i++) {
-        int value = 0;
-        scanf("%d",&value);
-        binaryTree = insert(binaryTree,value);
+Tree* sortedArrayToBST(int* arr,const int size) {
+    if(size <= 0) {
+        return NULL;
     }
-    printf("Hello, World!\n");
-    inOrder(binaryTree);
-    printf("le nombre de noeud : %d\n",count_tree_node(binaryTree));
-    int height = getHeight(binaryTree);
-    printf("le height : %d\n",height);
-    int left = count_left_tree(binaryTree);
-    printf("le nombre de noeud left : %d \n",left);
+    int left = 0;
+    int right = (size - 1);
+    int mid = (left + right)/2;
 
-    printf("denut de la fonction inOrderInArray\n");
+    Tree* leftNode = sortedArrayToBST(arr,mid);
+    Tree* rightNode = sortedArrayToBST(arr + mid + 1,right - mid);
+
+    Tree* proot = (Tree*)malloc(sizeof(Tree*));
+    proot->data = arr[mid];
+    proot->left = leftNode;
+    proot->right = rightNode;
+
+    return proot;
+}
+
+void preOrderInArray(const Tree *root,int* array,int* size) {
+    if(root != NULL){
+        array[++(*size)] = root->data;
+        preOrder(root->left);
+        preOrder(root->right);
+    }
+}
+
+int* preorderTraversal(const Tree* root,int* returnSize) {
+    int* array = (int*)malloc(100*sizeof(int));
+    int i = 0;
+
+    preOrderInArray(root,array,&i);
+    *returnSize = i;
+    return array;
+}
+
+void postOrderTraversalInArray(const Tree* root,int* array,int* size) {
+    if(root != NULL) {
+        postOrderTraversalInArray(root->left,array,size);
+        postOrderTraversalInArray(root->right,array,size);
+        array[(*size)] = root->data;
+        (*size)++;
+    }
+}
+
+int* postOrderTraversal(const Tree* root,int* returnSize) {
+    int* array = (int*)malloc(100*sizeof(int));
+    if(array == NULL) {
+        fprintf(stderr,"erreur d'allocation\n");
+        exit(EXIT_FAILURE);
+    }
+    int i = 0;
+
+    postOrderTraversalInArray(root,array,&i);
+    *returnSize = i;
+
+    return array;
+}
+
+bool isBalanced(const Tree* root) {
+    if(root == NULL) {
+        return true;
+    }
+
+    const int leftHeight = height(root->left);
+    const int rightHeight = height(root->right);
+
+    if(abs(leftHeight - rightHeight) <= 1 && isBalanced(root->left) && isBalanced(root->right)) {
+        return true;
+    }
+    return false;
+}
+
+//pour l'instant ne sert pas a grand chose
+Tree* lookV(Tree* root,const int v) {
+    while(root != NULL && v != root->data) {
+        if(v < root->data) {
+            root = root->left;
+        }else {
+            root = root->right;
+        }
+    }
+    return root;
+}
+
+Tree* lca(Tree* root,const int v1,const int v2) {
+    while(root != NULL) {
+        if(v1 < root->data && v2 < root->data) {
+            root = root->left;
+        }else if(v1 > root->data && v2 > root->data) {
+            root = root->right;
+        }else {
+            break;
+        }
+    }
+    return root;
+}
+
+void level_order_to_array(const Tree* root,const int level,int* arr,int* size) {
+    if(root == NULL) {
+        return;
+    }
+    if(level == 1) {
+        arr[*size] = root->data;
+        (*size)++;
+    }else if(level > 1) {
+        level_order_to_array(root->left,level - 1,arr,size);
+        level_order_to_array(root->right,level - 1,arr,size);
+    }
+}
+
+void levelOrderToArray(const Tree* root,int* arr,int* size) {
+    const short h = height(root);
+    for(short i = 1;i <= h;i++) {
+        level_order_to_array(root,i,arr,size);
+    }
+}
+
+Tree* invertBinaryTreeFromArray(Tree* root,const int value) {
+    if(root == NULL) {
+        Tree* node = createNode(value);
+        return node;
+    }else {
+        Tree* cur = NULL;
+        if(value >= root->data) {
+            cur = invertBinaryTreeFromArray(root->left,value);
+            root->left = cur;
+        }else {
+            cur = invertBinaryTreeFromArray(root->right,value);
+            root->right = cur;
+        }
+        return root;
+    }
+
+}
+
+Tree* invertTree(Tree* root) {
+    if(root == NULL) {
+        return NULL;
+    }
+    int *arr = (int*)calloc(100,sizeof(int*));
+    if(arr == NULL) {
+        fprintf(stderr,"allocation arr failled\n");
+        exit(EXIT_FAILURE);
+    }
     int size = 0;
-    int* t = inOrderInArray(binaryTree, &size);
-    printf("ize = %d\n",size);
-    for(int i = 0;i < 10;i++) {
-        printf("%d ",t[i]);
+    levelOrderToArray(root,arr,&size);
+
+    printf("size = %d\n",size);
+    for(int i = 0;i < size;i++) {
+        printf("%d ",arr[i]);
     }
-    free(t);
-    deleteTree(binaryTree);
-    */
-    testLevelOrder();
-    return 0;
+    Tree* newRoot = NULL;
+    newRoot = insert(newRoot,arr[0]);
+
+    for(int i = 1;i < size;i++ ) {
+        newRoot = invertBinaryTreeFromArray(newRoot,arr[i]);
+    }
+    printf("\n affichage du level order apres newRoot \n");
+    levelOrder(newRoot);
+
+    free(arr);
+    return newRoot;
 }
-/*fonction main pour travailler avec la fonction insert qui le fait sur la logique l'arbre de recherche binaire
- * la fonction ne fait que ajouter l'un apres l'autre tout en respectant les regles de la recherche d'arbre binaire
-* int main() {
 
-    struct node* root = NULL;
-
-    int t;
-    int data;
-
-    scanf("%d", &t);
-
-    while(t-- > 0) {
-        scanf("%d", &data);
-        root = insert(root, data);
+//la solution precedente de invert est bien placer pour resoudre des arbres parfaits qui n'ont pas de valeurs null
+//a la place d'un fils mais aussi la fonction pour convertir le level order en tableau est benefique
+// Fonction pour inverser un arbre binaire
+Tree* invertTreeBest(Tree* root) {
+    if(root == NULL) {
+        return NULL;
     }
 
-    preOrder(root);
-    return 0;
+    Tree* temp = root->left;
+    root->left = root->right;
+    root->right = temp;
+
+    invertTreeBest(root->left);
+    invertTreeBest(root->right);
+
+    return root;
 }
- */
+
+Tree* searchMinValue(Tree* root) {
+    if(root == NULL || root->data == 0) {
+        return NULL;
+    }
+    if(root->left == NULL) {
+        return root;
+    }
+    return searchMinValue(root->left);
+}
+
+Tree* searchMaxValue(Tree* root) {
+    if(root == NULL || root->data == 0) {
+        return NULL;
+    }
+    if(root->right == NULL) {
+        return root;
+    }
+    return searchMaxValue(root->right);
+}
