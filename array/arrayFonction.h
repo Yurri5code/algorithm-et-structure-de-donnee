@@ -57,4 +57,28 @@ void printTable(const hashTable* table);
 void insertWithHash(const hashTable* table, const int value, int* array, int* sizeArr);
 hashTable* createTableOptimisation();
 int* intersect(const int* nums1, int nums1Size,const int* nums2, int nums2Size, int* returnSize);
+int* intersectQsort(int* nums1, int nums1Size, int* nums2, int nums2Size, int* returnSize);
+int compare(const void* a, const void* b);
+int mySqrt(const int x);
+bool isPerfectSquare(const int num);
+int partition(int arr[],int low,int high);
+void quickSort(int arr[],int low,int high);
+void printArray(const int arr[],const size_t size);
+int* quickSort1(const int arr_count,const int* arr,int* result_count);
+void swapShell(int array[],const int a,const int b);
+void shellShort(int array[],const int length);
+int thirdMax(int* nums,int numsSize);
+int* cutTheSticks(int arr_count,int* arr,int* result_count);
+int* cutTheSticksOptimisationVersion(int arr_count, int* arr, int* result_count);
+bool compareArray(const int* arr1,const int* arr2,const int size1,const int size2);
+int* countingSort1(int arr_count,const int* arr,int* result_count);
+int* countingSort(int arr_count,const int* arr,int* returnSize);
+int* countingSortOptimisation(int arr_count,const int* arr, int* result_count);
+unsigned int sum_of_squares(unsigned int number);
+unsigned int square_of_sum(unsigned int number);
+unsigned int difference_of_squares(unsigned int number);
+void merge(int array[],int temp[],int left,int right,int rightEndIndex);
+void mergeSort(int array[],int temp[],int left,int right);
+void sort(int array[],int length);
+
 #endif //ARRAYFUNCTIONS_H
