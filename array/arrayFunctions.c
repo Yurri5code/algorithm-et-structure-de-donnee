@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "arrayFunctions.h"
 #define TRUE 1
 #define FAlSE 0
@@ -563,4 +564,433 @@ int* intersect(const int* nums1, int nums1Size,const  int* nums2, int nums2Size,
 
     deleteHashTable(table);
     return array;
+}
+
+//solution avec qsort une maniere generique de trier
+int compare(const void* a, const void* b){
+    return *(int*)a - *(int*)b;
+}
+
+int* intersectQsort(int* nums1, int nums1Size, int* nums2, int nums2Size, int* returnSize) {
+    int* result = (int*)malloc(sizeof(int)*1001);
+
+    qsort(nums1, nums1Size, sizeof(int), compare);
+    qsort(nums2, nums2Size, sizeof(int), compare);
+
+    int length = 0, i, j;
+
+    for(i = 0, j = 0; i < nums1Size && j < nums2Size; i++, j++){
+        if(nums1[i] == nums2[j])
+            result[length++] = nums1[i];
+        else if(nums1[i] < nums2[j])
+            j--;
+        else
+            i--;
+    }
+
+    *returnSize = length;
+    result = realloc(result, sizeof(int)*length);
+    return result;
+}
+// il a utiliser realloc pour reamenager la menoire c'est ingenieux.
+
+int mySqrt(const int x) {
+    if(x == 1)return 1;
+    if(x < 2){
+        return 0;
+    }
+
+    int start = 0, end = x / 2, result = 0;
+
+    while (start <= end) {
+        int mid = (start + end) / 2;
+        long sqr = (long)mid * mid;
+
+        if (sqr == x) {
+            return mid;
+        } else if (sqr < x) {
+            start = mid + 1;
+            result = mid;
+        } else {
+            end = mid - 1;
+        }
+    }
+
+    return result;
+}
+
+bool isPerfectSquare(const int num) {
+    if(num == 1) {
+        return true;
+    }
+
+    int start = 0,end = num / 2;
+
+    while(start <= end) {
+        long long mid = (start + end)/2;
+        long long sqrt = mid*mid;
+
+        if(sqrt == num) {
+            return true;
+        }else if(sqrt < num) {
+            start = mid + 1;
+        }else {
+            end = mid - 1;
+        }
+    }
+    return false;
+}
+
+int partition(int arr[],int low,int high) {
+    const int pivot = arr[high];
+    int i = (low - 1);
+
+    for(int j = low;j < high;j++) {
+        if(arr[j] <= pivot) {
+            i++;
+            swap(&arr[i],&arr[j]);
+        }
+    }
+    swap(&arr[i+1],&arr[high]);
+    return i + 1;
+}
+
+void quickSort(int arr[],int low,int high) {
+    if(low < high) {
+        int pi = partition(arr,low,high);
+        quickSort(arr,low,pi -1);
+        quickSort(arr,pi + 1,high);
+    }
+}
+
+void printArray(const int arr[],const size_t size) {
+    for(int i = 0;i < size;i++) {
+        printf("%d ",arr[i]);
+    }
+    printf("         end of array\n");
+}
+
+//quickSort sans recursion n'effectue que la premiere etape
+int* quickSort1(const int arr_count,const int* arr,int* result_count) {
+    *result_count = arr_count;
+    int j = 0,pivot = arr[0];
+    int* ar = (int*)malloc(arr_count*sizeof(int));
+
+    for(int i = 0;i < arr_count;i++) {
+        if(arr[i] < pivot) {
+            ar[j++] = arr[i];
+        }
+    }
+
+    ar[j++] = pivot;
+    for(int i = 0;i < arr_count;i++) {
+        if(arr[i] > pivot) {
+            ar[j++] = arr[i];
+        }
+    }
+
+    return ar;
+}
+
+void swapShell(int array[],const int a,const int b){
+    array[a] = array[a] + array[b];
+    array[b] = array[a] - array[b];
+    array[a] = array[a] - array[b];
+}
+
+void shellShort(int array[],const int length){
+    for(int gap = length/2;gap>0;gap = gap /2){
+        for(int i = gap;i < length;i++){
+            int j = i;
+            while(j - gap >= 0 && array[j] < array[j - gap]){
+                swapShell(array,j,j - gap);
+                j = j - gap;
+            }
+        }
+    }
+}
+
+int thirdMax(int* nums, int numsSize) {
+    if(numsSize == 1){
+        return nums[0];
+    }else if(numsSize == 2){
+        if(nums[0] > nums[1]){
+            return nums[0];
+        }else{
+            return nums[1];
+        }
+    }
+
+    quickSort(nums,0,numsSize -1);
+    int max = nums[numsSize - 1],i = numsSize -1;
+    while(max == nums[i] && i > 0){
+        i--;
+    }
+    max = nums[i];
+    while(max == nums[i] && i>0){
+        i--;
+    }
+    if(max == nums[0]){
+        i--;
+    }
+    if(i < 0){
+        return nums[numsSize - 1];
+    }
+
+    return nums[i];
+}
+
+int* cutTheSticks(int arr_count,int* arr,int* result_count) {
+    quickSort(arr,0,arr_count -1);
+
+    int final = 0,k = 0,size = 1;
+    int* t = (int*)malloc(arr_count*sizeof(int));
+    int* result = (int*)malloc(arr_count*sizeof(int));
+    result[0] = arr_count;
+
+    while(final != 1) {
+        const int min = arr[0];
+        for(int i = 0;i < arr_count;i++) {
+            if((arr[i] - min)>0) {
+                t[k] = arr[i] - min;
+                k+=1;
+            }
+        }
+
+        for(int i = 0;i <= k;i++) {
+            arr[i] = t[i];
+        }
+        final = k;
+        arr_count = k;
+        printf("k = %d \n",k);
+        if(k > 0) {
+            result[size++] = k;
+        }
+        k = 0;
+    }
+    result = (int*)realloc(result,size*sizeof(int));
+    *result_count = size;
+    free(t);
+    return result;
+}
+
+int* cutTheSticksOptimisationVersion(int arr_count, int* arr, int* result_count) {
+    quickSort(arr, 0, arr_count - 1);
+
+    int size = 0;
+    int* result = (int*)malloc(arr_count * sizeof(int));
+    result[size++] = arr_count;
+
+    int current_length = arr_count;
+    int min = arr[0];
+
+    for (int i = 0; i < arr_count;) {
+        int count = 0;
+        while (i < arr_count && arr[i] == min) {
+            count++;
+            i++;
+        }
+        current_length -= count;
+        if (current_length > 0) {
+            result[size++] = current_length;
+            if (i < arr_count) {
+                min = arr[i];
+            }
+        }
+    }
+
+    result = (int*)realloc(result, size * sizeof(int));
+    *result_count = size;
+
+    return result;
+}
+
+bool compareArray(const int* arr1,const int* arr2,const int size1,const int size2) {
+    if(size1 != size2) {
+        return false;
+    }
+
+    for(int i = 0;i < size1;i++) {
+        if(arr1[i] != arr2[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+//la fonction countingSort1 compte pour 100 element
+int* countingSort1(int arr_count,const int* arr,int* result_count) {
+    int* result = (int*)calloc(100,sizeof(int));
+    if(result == NULL) {
+        fprintf(stderr,"allocation failled\n");
+        exit(EXIT_FAILURE);
+    }
+    *result_count = 100;
+
+    for(int i = 0;i < arr_count;i++) {
+        result[arr[i]]++;
+    }
+    return result;
+}
+
+int* countingSort(int arr_count,const int* arr,int* returnSize) {
+    int* result = (int*)calloc(100,sizeof(int));
+    if(result == NULL) {
+        fprintf(stderr,"allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    for(int i = 0;i < arr_count;i++) {
+        result[arr[i]]++;
+    }
+    printArray(result,arr_count);
+    int* newArray = (int*)calloc(arr_count,sizeof(int));
+    if(newArray == NULL) {
+        fprintf(stderr,"allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int j = 0;
+    for(int i = 0;i < 100;i++) {
+        if(result[i] == 1) {
+            newArray[j] = i;
+            j++;
+        }else if(result[i] > 1) {
+            int c = result[i];
+            while(c > 0) {
+                newArray[j] = i;
+                j++;
+                c--;
+            }
+        }
+    }
+    printf("affiche newArray\n");
+    printArray(newArray,j);
+    *returnSize = arr_count;
+    free(result);
+    return newArray;
+}
+
+int* countingSortOptimisation(int arr_count,const int* arr, int* result_count) {
+    // Trouver la valeur maximale dans le tableau pour optimiser la taille de "result"
+    int max_val = 0;
+    for (int i = 0; i < arr_count; i++) {
+        if (arr[i] > max_val) {
+            max_val = arr[i];
+        }
+    }
+
+    // Allouer de la mémoire pour le tableau de comptage
+    int* result = (int*)calloc(max_val + 1, sizeof(int));
+    if (result == NULL) {
+        fprintf(stderr, "allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Remplir le tableau de comptage
+    for (int i = 0; i < arr_count; i++) {
+        result[arr[i]]++;
+    }
+
+    // Allouer de la mémoire pour le tableau trié
+    int* sortedArray = (int*)malloc(arr_count * sizeof(int));
+    if (sortedArray == NULL) {
+        fprintf(stderr, "allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Remplir le tableau trié en fonction des occurrences
+    int j = 0;
+    for (int i = 0; i <= max_val; i++) {
+        while (result[i] > 0) {
+            sortedArray[j++] = i;
+            result[i]--;
+        }
+    }
+
+    *result_count = arr_count;
+    free(result);
+    return sortedArray;
+}
+
+unsigned int square_of_sum(unsigned int number) {
+    unsigned int square = 0;
+    for(unsigned int i = 0;i <= number;i++) {
+        square +=i;
+    }
+    square = pow(square,2);
+
+    return square;
+}
+
+unsigned int sum_of_squares(unsigned int number){
+    unsigned int square = 0;
+    for(unsigned int i = 1;i <= number;i++) {
+        square += pow(i,2);
+    }
+    return square;
+}
+
+unsigned int difference_of_squares(unsigned int number) {
+    return (unsigned int)(square_of_sum(number) - sum_of_squares(number));
+}
+/*
+ * meilleure solution en evitant les boucles
+* unsigned int square_of_sum(unsigned int number)
+{
+   unsigned int sum = (number * (number + 1)) / 2;
+   return sum * sum;
+}
+
+unsigned int sum_of_squares(unsigned int number)
+{
+   return (number * (number + 1) * ((number * 2) + 1)) / 6;
+}
+
+unsigned int difference_of_squares(unsigned int number)
+{
+   return square_of_sum(number) - sum_of_squares(number);
+}
+ */
+
+void mergeSort(int array[],int temp[],int left,int right){
+    if(left < right){
+        int center = (left + right)/2;
+        mergeSort(array,temp,left,center);//left merge sort
+        mergeSort(array,temp,center+1,right);//right merge sort
+        merge(array,temp,left,center+1,right);//merge two ordered arrays
+    }
+}
+
+void merge(int array[],int temp[],int left,int right,int rightEndIndex){
+    int leftEndIndex = right - 1;
+    int tempIndex = left;
+    int elementNumber = rightEndIndex - left + 1;
+
+    while(left <= leftEndIndex && right <= rightEndIndex){
+        if(array[left] <= array[right]){
+            temp[tempIndex++] = array[left++];
+        }else{
+            temp[tempIndex++] = array[right++];
+        }
+    }
+
+    while(left <= leftEndIndex){
+        temp[tempIndex++] = array[left++];
+    }
+
+    while(right <= rightEndIndex){
+        temp[tempIndex++] = array[right++];
+    }
+
+    for(int i = 0;i < elementNumber;i++){
+        array[rightEndIndex] = temp[rightEndIndex];
+        rightEndIndex--;
+    }
+}
+
+void sort(int array[],int length){
+    int temp[length];
+    mergeSort(array,temp,0,length - 1);
 }
