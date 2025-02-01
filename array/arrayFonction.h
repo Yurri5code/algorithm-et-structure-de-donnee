@@ -80,5 +80,12 @@ unsigned int difference_of_squares(unsigned int number);
 void merge(int array[],int temp[],int left,int right,int rightEndIndex);
 void mergeSort(int array[],int temp[],int left,int right);
 void sort(int array[],int length);
+long countBits(long number);
+char* counterGame(const long n);
+int countSetBits(unsigned long long n);
+int maximunCount(const int* nums,const int numsSize);
+int* findDisappearedNumbers(int* nums,const int numsSize,int* returnSize);
+void removeDuplicates(int* arr, int* size);
+int jumpingOnClouds(const int c_count,const int* c);
 
 #endif //ARRAYFUNCTIONS_H
