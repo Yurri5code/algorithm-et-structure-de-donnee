@@ -994,3 +994,134 @@ void sort(int array[],int length){
     int temp[length];
     mergeSort(array,temp,0,length - 1);
 }
+
+/*
+ * la fonction counterBit calcul le nombre de bits d'un nombre
+ */
+long countBits(long number) {
+    long count = 0;
+
+    if (number < 0) {
+        number = ~number; // On prend le complément à un
+    }
+
+    // Compter les bits
+    while (number > 0) {
+        count++;
+        number >>= 1; // Décaler le nombre vers la droite
+    }
+
+    return count;
+}
+
+/*la fonction counterGame calcul le vainqueur entre deux
+ * joueur Louise et Richard
+ *
+ */
+int countSetBits(unsigned long long n) {
+    int count = 0;
+    while(n) {
+        count += n&1;
+        n >>=1;
+    }
+
+    return count;
+}
+char* counterGame(const long n) {
+    const int m = countSetBits(n - 1);
+
+    return m % 2 == 0? "Richard" : "Louise";
+}
+
+int maximunCount(const int* nums,const int numsSize) {
+    int minus = 0,plus = 0;
+    for(int i = 0;i < numsSize;i++) {
+        if(nums[i] < 0) {
+            minus++;
+        }
+        if(nums[i] > 0) {
+            plus++;
+        }
+    }
+    return plus >= minus ? plus : minus;
+}
+
+
+void removeDuplicates(int* arr, int* size) {
+    if (*size == 0) return;
+
+    int temp[*size];
+    int j = 0;
+
+    for (int i = 0; i < *size; i++) {
+        int k;
+        for (k = 0; k < j; k++) {
+            if (arr[i] == temp[k]) {
+                break;
+            }
+        }
+
+        // If no duplicate is found, add it to the temp array
+        if (k == j) {
+            temp[j] = arr[i];
+            j++;
+        }
+    }
+
+    // Copy non-duplicate elements back to the original array
+    for (int i = 0; i < j; i++) {
+        arr[i] = temp[i];
+    }
+
+    // Update the size to the new length
+    *size = j;
+}
+
+/*
+ * cette fonction findDissappearedNumber permet de creer a partir d'un tableau existant et de mettre dans le nouvea tableau
+ * les elements absents du premier
+ * exemple t[] = {1,2,3,5,5,7,5,9,11}
+ * le nouveau tab qui sera renvoyer sera tab[] = {4,6,7,8,10}
+ * sur leetcode la fonction passe les tests avec 4ms c'est plutot bon
+ * il y a des codes avec 23ms
+ */
+int* findDisappearedNumbers(int* nums,int numsSize,int* returnSize) {
+    int* result = (int*)calloc(numsSize+1,sizeof(int));
+    for(int i = 0;i < numsSize;i++) {
+        result[nums[i]]++;
+    }
+    printArray(result,numsSize+1);
+    int* solution = (int*)malloc(numsSize*sizeof(int));
+    int c = 0;
+    for(int i = 1;i < numsSize+1;i++) {
+        if(result[i] == 0) {
+            solution[c] = i;
+            c++;
+        }
+    }
+    *returnSize = c;
+    free(result);
+    return solution;
+}
+
+int jumpingOnClouds(const int c_count,const int* c) {
+    if(c_count == 2) {
+        return 1;
+    }
+
+    int mov = 0;
+    for(int i = 0;i < c_count;i++) {
+        if((i+1) < c_count && c[i+1] == 1) {
+            mov++;
+            i++;
+        }else if(((i+1) < c_count || (i+2) < c_count ) && c[i+1] == 0 && c[i+2] == 1) {
+            mov++;
+        }else if(((i+1) < c_count || (i+2) < c_count ) && c[i+1] == 0 && c[i+2] == 0) {
+            mov++;
+            i+=1;
+        }else {
+            mov++;
+        }
+    }
+    return mov - 1;
+}
