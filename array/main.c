@@ -113,12 +113,55 @@ void testCountingort() {
     free(array);
 }
 
+void testBitcounter() {
+    const long n = 1620434450;
+    printf("nombre de bit de %ld = %ld\n",n,countBits(n));
+}
+
+void testCounterGame() {
+    printf("Entrez le nombre de depart du jeu :  ");
+    printf("\n");
+    long initial = 0;
+    scanf("%ld",&initial);
+
+    char* winner = counterGame(initial);
+    printf("le vainquer est : %s \n",winner);
+
+    //free(winner);
+}
+
+void testMaximumCount() {
+    const int tab[] = {-3,-2,-1,0,0,1,2};
+    const size_t t = sizeof(tab)/sizeof(tab[0]);
+    printf("le max est : %d \n",maximunCount(tab,t));
+}
+
+void testFindDissapearNUnmber() {
+    int arr[] = {4,4,4,5,2,3,4,7,8,11,1};
+    size_t t = sizeof(arr)/sizeof(arr[0]);
+    int taille = 0;
+    int *s = findDisappearedNumbers(arr,t,&taille);
+
+    for(int i = 0;i < taille;i++) {
+        printf("(%d)->",s[i]);
+    }
+}
+
+void testJumpingOnClouds() {
+    const int arr[] = {0,0};
+    const size_t l = sizeof(arr)/sizeof(arr[0]);
+
+    printf("the minimun jump is : %d \n",jumpingOnClouds(l,arr));
+}
+
 int main(void) {
-    unsigned int result = difference_of_squares(5);
+
+    testJumpingOnClouds();
+    /*unsigned int result = difference_of_squares(5);
 
     printf("difference = %u\n",result);
     printf("square of sum = %u\n",square_of_sum(5));
-    printf("sum of square = %u\n",sum_of_squares(5));
+    printf("sum of square = %u\n",sum_of_squares(5));*/
 
     return 0;
 }
