@@ -573,7 +573,10 @@ int compare(const void* a, const void* b){
 
 int* intersectQsort(int* nums1, int nums1Size, int* nums2, int nums2Size, int* returnSize) {
     int* result = (int*)malloc(sizeof(int)*1001);
-
+    if(result == NULL) {
+        perror("error allocation \n");
+        exit(EXIT_FAILURE);
+    }
     qsort(nums1, nums1Size, sizeof(int), compare);
     qsort(nums2, nums2Size, sizeof(int), compare);
 
@@ -589,7 +592,7 @@ int* intersectQsort(int* nums1, int nums1Size, int* nums2, int nums2Size, int* r
     }
 
     *returnSize = length;
-    result = realloc(result, sizeof(int)*length);
+    //result = realloc(result, sizeof(int)*length);
     return result;
 }
 // il a utiliser realloc pour reamenager la menoire c'est ingenieux.
@@ -1085,11 +1088,16 @@ void removeDuplicates(int* arr, int* size) {
  * sur leetcode la fonction passe les tests avec 4ms c'est plutot bon
  * il y a des codes avec 23ms
  */
-int* findDisappearedNumbers(int* nums,int numsSize,int* returnSize) {
+int* findDisappearedNumbers(const int* nums,const int numsSize,int* returnSize) {
     int* result = (int*)calloc(numsSize+1,sizeof(int));
+    if(result == NULL) {
+        perror("allocation failed \n");
+        exit(EXIT_FAILURE);
+    }
     for(int i = 0;i < numsSize;i++) {
         result[nums[i]]++;
     }
+
     printArray(result,numsSize+1);
     int* solution = (int*)malloc(numsSize*sizeof(int));
     int c = 0;
@@ -1124,4 +1132,111 @@ int jumpingOnClouds(const int c_count,const int* c) {
         }
     }
     return mov - 1;
+}
+
+
+// Fonction pour effectuer la recherche binaire
+//avec la fonction findsmallOccurrence
+int binarySearch(int arr[],const int size,const int x) {
+    int left = 0, right = size - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (arr[mid] == x)
+            return mid;
+        if (arr[mid] < x)
+            left = mid + 1;
+        else
+            right = mid - 1;
+    }
+    return -1;
+}
+
+// Fonction pour trouver la plus petite valeur commune
+int findSmallestCommon(int arr1[], int size1, int arr2[], int size2) {
+    // Trier les deux tableaux
+    qsort(arr1, size1, sizeof(int), compare);
+    qsort(arr2, size2, sizeof(int), compare);
+
+    int smallestCommon = -1;
+
+    // Utiliser la recherche binaire pour trouver la plus petite valeur commune
+    for (int i = 0; i < size1; i++) {
+        if (binarySearch(arr2, size2, arr1[i]) != -1) {
+            smallestCommon = arr1[i];
+            break;
+        }
+    }
+
+    return smallestCommon;
+}
+
+bool thereAreNumberInArray(const int* arr,const int size,const int value) {
+    for(int i = 0;i < size;i++) {
+        if(value == arr[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/*Cette version ne repond pas aux criteres lorsqu'il s'agit de grande donnees d'information
+ * pour il faut prend la fonction precedent qui realise cela avec un peu moins de temps
+ * findSmallestCommon avec une recherche binaire
+ */
+int getCommon(int* nums1,const int nums1Size,int* nums2,const int nums2Size) {
+    qsort(nums1,nums1Size,sizeof(int),compare);
+    qsort(nums2,nums2Size,sizeof(int),compare);
+
+    for(int i = 0;i < nums1Size;i++) {
+        if(thereAreNumberInArray(nums2,nums2Size,nums1[i])) {
+            return nums1[i];
+        }
+    }
+    return 0;
+}
+
+int getCommonSpeed(const int* nums1,const int nums1Size,const int* nums2,const int nums2Size) {
+    int i=0,j=0;
+    while((i<nums1Size)&&(j<nums2Size))
+    {
+        if(nums1[i]<nums2[j])
+            i++;
+        else if(nums1[i]>nums2[j])
+            j++;
+        else
+            return nums1[i];
+    }
+    return -1;
+}
+
+int countKDifference(const int* nums,const int numsSize,const int k) {
+    int count = 0;
+    for(int i = 0;i < numsSize;i++) {
+        for(int j = i + 1;j < numsSize;j++) {
+            if(abs(nums[i] - nums[j]) == k) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+/*
+ * le code suivant est plus optimiser que le mien et occupe que 0ms a la place de
+ * mon code qui occupe 3ms et bat 66,67% des utilisateurs
+ * et en memoire bat 90,63% des utilisateurs
+ */
+int countKDifference(int* nums,const int numsSize,const int k) {
+    int freq[101] = {0};
+    int res = 0;
+    for (int i = 0; i < numsSize; i++) {
+        freq[nums[i]]++;
+        if (nums[i] - k >= 1) {
+            res += freq[nums[i] - k];
+        }
+        if (nums[i] + k <= 100) {
+            res += freq[nums[i] + k];
+        }
+    }
+    return res;
 }
