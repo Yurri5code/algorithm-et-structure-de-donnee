@@ -84,8 +84,14 @@ long countBits(long number);
 char* counterGame(const long n);
 int countSetBits(unsigned long long n);
 int maximunCount(const int* nums,const int numsSize);
-int* findDisappearedNumbers(int* nums,const int numsSize,int* returnSize);
+int* findDisappearedNumbers(const int* nums,const int numsSize,int* returnSize);
 void removeDuplicates(int* arr, int* size);
 int jumpingOnClouds(const int c_count,const int* c);
-
+int binarySearch(int arr[],const int size,const int x);
+int findSmallestCommon(int arr1[], int size1, int arr2[], int size2);
+bool thereAreNumberInArray(const int* arr,const int size,const int value);
+int getCommon(int* nums1,const int nums1Size,int* nums2,const int nums2Size);
+int getCommonSpeed(const int* nums1,const int nums1Size,const int* nums2,const int nums2Size);
+int countKDifference(const int* nums,const int numsSize,const int k);
+int countKDifference(int* nums,const int numsSize,const int k);
 #endif //ARRAYFUNCTIONS_H
